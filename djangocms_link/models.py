@@ -49,6 +49,8 @@ class BaseLink(models.Model):
     # used by django CMS search
     search_fields = ('name', )
 
+    link_is_optional = False # Set to true if no link is allowed
+
     url_validators = [IntranetURLValidator(intranet_host_re=HOSTNAME),]
 
     template = models.CharField(
@@ -186,6 +188,10 @@ class BaseLink(models.Model):
             raise ValidationError(errors)
 
         if len(provided_link_fields) == 0 and not self.anchor:
+            if self.link_is_optional:
+                # It's not needed to set a link
+                return
+
             raise ValidationError(
                 _('Please provide a link.')
             )
